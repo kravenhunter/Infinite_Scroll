@@ -1,0 +1,18 @@
+@import '@/assets/styles/normalize.scss';
+@import '@/assets/styles/variables.scss';
+
+body {
+  min-height: 100vh;
+}
+
+li {
+  list-style: none;
+}
+
+#app {
+  margin: 0 auto;
+  padding: 2rem;
+  font-weight: normal;
+  height: 100vh;
+  display: grid;
+}
