@@ -1,13 +1,39 @@
 <script setup lang="ts">
 import { generateRandomNumber } from '@/utils'
+import { ref, toRefs, watch } from 'vue'
 import NumberBlock from './NumberBlock.vue'
-defineProps<{
+
+const props = defineProps<{
+  indexKey: number
   numberArray: number[]
+  scrollMove: number
+
+  scrollBlockPosition?: {
+    scrolTop: number
+    scrollBottom: number
+  }
 }>()
+
+const refList = ref()
+const isShow = ref(true)
+const { scrollBlockPosition, scrollMove } = toRefs(props)
+
+watch(scrollMove, () => {
+  const getVerticalPositio: DOMRect = refList.value.getBoundingClientRect()
+
+  if (getVerticalPositio.y > 239 && getVerticalPositio.y < 620) {
+    isShow.value = true
+  } else {
+    isShow.value = false
+  }
+})
 </script>
 <template>
-  <ul class="infinite__scroll__list">
-    <li v-for="number in numberArray" :key="number">
+  <ul
+    :class="`infinite__scroll__list list-enter-active ${!isShow ? 'list-leave-to' : ''} `"
+    ref="refList"
+  >
+    <li v-for="(number, i) in numberArray" :key="i">
       <NumberBlock :number="number" :border-radios="`${generateRandomNumber(50)}px`" />
     </li>
   </ul>
