@@ -1,39 +1,34 @@
-# infinite_scroll
+# Описание проекта
 
-This template should help get you started developing with Vue 3 in Vite.
+Тестовое задание: Приложение с компонентом виртуального скролла
 
-## Recommended IDE Setup
+Функционал приложения компонента TrueVirtualScroll:
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- Принимает на вход пропсы: total-data (2-мерный числовой массив),colSize (размер ячейки), visibleRows (количество видимых строк, в зависимости от количества вычисляется высота скролл-листа), colsLimit (количество ячеек в строке). Пропс total-data обязательный, остальные с дефольтными значениями.
+- Возможность начать или продолжить тестирование-
+- Копмоненты выводит не отрисовывает весь массив данных , а только отрезки, проходясь по массиву в зависимости от направления скрола, тем самым не загружая приложене.
+- Для каждой ячейки генерится рандомное значение border
 
-## Type Support for `.vue` Imports in TS
+## Использование
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+Для начала работы с приложением необходимо:
 
-## Customize configuration
+1. Клонировать репозиторий `git clone <ссылка-репозитория>`
+2. Перейти в папку с клиентом `cd infinite_scroll`
+3. Установить все зависимости для клиента `npm install`
+4. Запустить сервер и клиент с помощью команда `npm run dev`
+5. Проверки ошибок `npm run lint`
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+## Развертывание
 
-## Project Setup
+Для начала работы с приложением необходимо:
 
-```sh
-npm install
-```
+1. Сборка проекта `npm run build`
+2. Предпросмотр приложения `npm run preview`
 
-### Compile and Hot-Reload for Development
+## Stack
 
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+- Vue 3
+- Typescript
+- Scss
+- Eslint + Prietter

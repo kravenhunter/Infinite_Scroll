@@ -1,20 +1,16 @@
 <script setup lang="ts">
 import { NumberBlock } from '@/components'
-import { computed, ref } from 'vue'
-
+import { computed, ref, watch } from 'vue'
+import type { IBlock } from '../../type'
 //Описываем  дефолтное состояние пропсов  и деструктурируем объект свойства для использования
 const { totalData, colSize, visibleRows, colsLimit } = withDefaults(
   defineProps<{
-    totalData: number[][]
-    maxHeigth?: string
-    padding?: string
+    totalData: IBlock[][]
     colSize?: string
     visibleRows?: number
     colsLimit?: number
   }>(),
   {
-    maxHeigth: '378px',
-    padding: '25px 15px',
     colSize: '50px',
     visibleRows: 3,
     colsLimit: 20
@@ -26,53 +22,68 @@ const itemHeight = +colSize.replace(/\D/g, '')
 
 //Ссылка на  Dom-элемент списка
 const refList = ref()
+const scrollBar = ref(0)
+const vidibleData = ref<IBlock[][]>(totalData.slice(0, visibleRows + 1))
 
 //Стартовый видимый элемент
 //Нумерация вычисляется scrollHandler при скролле
-const startVisibleInterval = ref(0)
-
-//Вычисляемое свойство формирует выбает видимый массив
-//  начало (startVisibleInterval)  до количества видимых объектов включительно
-const visibleDataComputed = computed(() =>
-  totalData.slice(startVisibleInterval.value, startVisibleInterval.value + visibleRows + 1)
-)
+const startVisibleIndex = ref(0)
+const endVisibleIndex = ref(0)
 
 //Временный блок-буффур для включения скролла вверх
 //Вычисляет  наличие  предыдущие элементов
 //Если следующих элементов нет то размер блока будет 0px
-const topEmptyComputed = computed(() => itemHeight * startVisibleInterval.value + 'px')
+const topEmptyComputed = computed(() => itemHeight * startVisibleIndex.value + 'px')
 //Временный  блок-буффур  для включения скролла вниз
 //Вычисляет наличие следующих элементов
 //Если следующих элементов нет то размер блока будет 0px
 const bottomEmptyComputed = computed(
-  () => itemHeight * (totalData.length - (startVisibleInterval.value + visibleRows)) + 'px'
+  () => itemHeight * (totalData.length - (startVisibleIndex.value + visibleRows)) + 'px'
 )
 //Вычисляемое свойство для ширины экрана списка
 //Записывается в стиль
 const countWidthSize = computed(() => itemHeight * colsLimit + itemHeight + colsLimit * 5 + 'px')
 
-//Обработчик скролла записывает в стартовый интервал (startVisibleInterval) количесство прокрученных строк
+const refreshData = (currentIndex: number) => {
+  startVisibleIndex.value = currentIndex
+  endVisibleIndex.value = startVisibleIndex.value + visibleRows + 1
+  vidibleData.value = totalData.slice(startVisibleIndex.value, endVisibleIndex.value)
+}
+
+watch(scrollBar, (curr, prev) => {
+  //Проверяем если предыдуший скрол меньше текущего значения то скроллим вверх , до момента когда
+  //предыдущее значение не станет 0 при отбросе дробных значений
+  // дабы избежать лишних пустых скроллов вверх
+
+  if (prev > curr && Math.trunc(prev) !== 0) {
+    refreshData(curr)
+  } else {
+    //Иначе скроллим вверхи до момента когда кочный dblbvsq не станет равен длинне главного массива,
+    // дабы избежать лишних пустых скроллов вниз
+    if (Math.trunc(endVisibleIndex.value) <= totalData.length) {
+      refreshData(curr)
+    }
+  }
+})
+//Обработчик скролла записывает в стартовый интервал (startVisibleIndex) количесство прокрученных строк
 const scrollHandler = () => {
   const getElement = refList.value as HTMLDivElement
-  startVisibleInterval.value = getElement.scrollTop / itemHeight
+  scrollBar.value = getElement.scrollTop / itemHeight
 }
 </script>
 
 <template>
   <div class="list__items" ref="refList" @scroll.native="scrollHandler">
-    <div class="list__items__top__empty"></div>
-    <ul v-for="(items, i) in visibleDataComputed" :key="startVisibleInterval + i">
-      <li
-        v-for="(item, k) in items"
-        :key="startVisibleInterval + '' + k + item"
-        class="list__items__item"
-      >
-        <NumberBlock :number="item" />
+    <!-- <div class="list__items__top__empty"></div> -->
+    <ul v-for="(items, i) in vidibleData" :key="startVisibleIndex + i">
+      <li v-for="(item, k) in items" :key="item.id" class="list__items__item">
+        <NumberBlock :id="item.id" :border-radios="item.borderSize" />
       </li>
     </ul>
-    <div class="list__items__bottom__empty"></div>
+    <!-- <div class="list__items__bottom__empty"></div> -->
   </div>
 </template>
+
 <style scoped lang="scss">
 .list__items {
   display: grid;
@@ -86,12 +97,20 @@ const scrollHandler = () => {
   height: calc(v-bind(colSize) * v-bind(visibleRows) + 15px * v-bind(visibleRows) + 15px * 2);
   overflow-y: auto; /* Добавление вертикальной прокрутки */
   scrollbar-gutter: stable;
-  &__top__empty {
+  &::before {
+    content: '';
     height: v-bind(topEmptyComputed);
   }
-  &__bottom__empty {
+  &::after {
+    content: '';
     height: v-bind(bottomEmptyComputed);
   }
+  // &__top__empty {
+  //   height: v-bind(topEmptyComputed);
+  // }
+  // &__bottom__empty {
+  //   height: v-bind(bottomEmptyComputed);
+  // }
   &__item {
     display: grid;
     place-content: center;

@@ -1,21 +1,18 @@
 <script setup lang="ts">
-import { generateRandomNumber } from '@/utils'
-const { number } = withDefaults(
+withDefaults(
   defineProps<{
     borderRadios?: string
     transition?: string
-    number?: number
+    id: number
   }>(),
   {
     borderRadios: '0px',
-    number: 1,
     transition: '100ms'
   }
 )
-const generateBorder = generateRandomNumber(number) + 'px'
 </script>
 <template>
-  <div class="number__block">{{ number }}</div>
+  <div class="number__block">{{ id }}</div>
 </template>
 
 <style scoped lang="scss">
@@ -26,7 +23,7 @@ const generateBorder = generateRandomNumber(number) + 'px'
   width: 50px;
   height: 50px;
   border: 1px solid var(--color-dark);
-  border-radius: v-bind(generateBorder);
+  border-radius: v-bind(borderRadios);
   transition:
     width v-bind(transition),
     height v-bind(transition);

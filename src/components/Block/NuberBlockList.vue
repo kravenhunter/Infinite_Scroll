@@ -34,7 +34,7 @@ watch(scrollMove, () => {
     ref="refList"
   >
     <li v-for="(number, i) in numberArray" :key="i">
-      <NumberBlock :number="number" :border-radios="`${generateRandomNumber(50)}px`" />
+      <NumberBlock :id="number" :border-radios="`${generateRandomNumber(50)}px`" />
     </li>
   </ul>
 </template>
